@@ -265,6 +265,35 @@ class BasketAddItemsViewTests(
         basket = response.wsgi_request.basket
         self.assertEqual(basket.status, Basket.OPEN)
 
+    @ddt.data(
+        ('false', False),
+        ('true', True),
+    )
+    @ddt.unpack
+    def test_email_opt_in_when_explicitly_given(self, opt_in, expected_value):
+        """
+        Verify that email_opt_in is stored in session based off the query string
+        """
+        url = '{path}?sku={sku}&email_opt_in={opt_in}'.format(
+            path=self.path,
+            sku=self.stock_record.partner_sku,
+            opt_in=opt_in,
+        )
+        self.client.get(url)
+        self.assertEqual(self.client.session['email_opt_in'], expected_value)
+
+    def test_email_opt_in_when_not_given(self):
+        """
+        Verify that email_opt_in defaults to false if not specified
+        """
+
+        url = '{path}?sku={sku}'.format(
+            path=self.path,
+            sku=self.stock_record.partner_sku,
+        )
+        self.client.get(url)
+        self.assertEqual(self.client.session['email_opt_in'], False)
+
 
 @httpretty.activate
 @ddt.ddt

@@ -60,6 +60,7 @@ class BasketAddItemsView(View):
 
         skus = [escape(sku) for sku in request.GET.getlist('sku')]
         code = request.GET.get('code', None)
+        request.session['email_opt_in'] = request.GET.get('email_opt_in') == 'true'
 
         if not skus:
             return HttpResponseBadRequest(_('No SKUs provided.'))
