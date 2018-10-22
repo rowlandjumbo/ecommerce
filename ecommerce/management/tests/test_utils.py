@@ -67,7 +67,8 @@ class FulfillFrozenBasketsTests(TestCase):
         card_number = '4111111111111111'
         response = {
             'req_card_number': card_number,
-            'req_card_type': CARD_TYPES['visa']['cybersource_code']
+            'req_card_type': CARD_TYPES['visa']['cybersource_code'],
+            u'decision': u'ACCEPT',
         }
         PaymentProcessorResponse.objects.create(basket=basket, transaction_id='abc', processor_name='cybersource',
                                                 response=response)
@@ -88,7 +89,8 @@ class FulfillFrozenBasketsTests(TestCase):
         basket.status = 'Frozen'
         basket.save()
 
-        PaymentProcessorResponse.objects.create(basket=basket, transaction_id='PAY-123', processor_name='paypal')
+        PaymentProcessorResponse.objects.create(basket=basket, transaction_id='PAY-123', processor_name='paypal',
+                                                response={u'state': u'approved'})
         assert FulfillFrozenBaskets().fulfill_basket(basket.id, self.site)
 
         order = Order.objects.get(number=basket.order_number)
