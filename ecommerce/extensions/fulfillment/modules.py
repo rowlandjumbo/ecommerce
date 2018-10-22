@@ -594,16 +594,21 @@ class CourseEntitlementFulfillmentModule(BaseFulfillmentModule):
         """
         return [line for line in lines if self.supports_line(line)]
 
-    def fulfill_product(self, order, lines):
+    def fulfill_product(self, order, lines, email_opt_in=False):
         """ Fulfills the purchase of a 'Course Entitlement'.
         Uses the order and the lines to determine which courses to grant an entitlement for, and with certain
         certificate types. May result in an error if the Entitlement API cannot be reached, or if there is
         additional business logic errors when trying grant the entitlement.
+        Updates the user's email preferences based on email_opt_in as a side effect.
+
         Args:
             order (Order): The Order associated with the lines to be fulfilled. The user associated with the order
                 is presumed to be the student to grant an entitlement.
             lines (List of Lines): Order Lines, associated with purchased products in an Order. These should only
                 be "Course Entitlement" products.
+            email_opt_in (Bool): Whether the user should be opted in to emails
+                as part of the fulfillment. Defaults to False.
+
         Returns:
             The original set of lines, with new statuses set based on the success or failure of fulfillment.
         """
@@ -623,6 +628,7 @@ class CourseEntitlementFulfillmentModule(BaseFulfillmentModule):
                 'course_uuid': UUID,
                 'mode': mode,
                 'order_number': order.number,
+                'email_opt_in': email_opt_in,
             }
 
             try:
