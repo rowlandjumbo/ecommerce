@@ -280,8 +280,10 @@ class BasketAddItemsViewTests(
             sku=self.stock_record.partner_sku,
             opt_in=opt_in,
         )
-        self.client.get(url)
+        response = self.client.get(url)
+        basket = response.wsgi_request.basket
         basket_attribute = BasketAttribute.objects.get(
+            basket=basket,
             attribute_type=BasketAttributeType.objects.get(name=EMAIL_OPT_IN_ATTRIBUTE),
         )
         self.assertEqual(basket_attribute.value_text, expected_value)
@@ -295,8 +297,10 @@ class BasketAddItemsViewTests(
             path=self.path,
             sku=self.stock_record.partner_sku,
         )
-        self.client.get(url)
+        response = self.client.get(url)
+        basket = response.wsgi_request.basket
         basket_attribute = BasketAttribute.objects.get(
+            basket=basket,
             attribute_type=BasketAttributeType.objects.get(name=EMAIL_OPT_IN_ATTRIBUTE),
         )
         self.assertEqual(basket_attribute.value_text, 'False')
